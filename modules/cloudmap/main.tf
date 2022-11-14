@@ -1,6 +1,7 @@
 #Public 
 locals {
-  anywhere_cidr_block = "0.0.0.0/0"
+  anywhere_cidr_block      = "0.0.0.0/0"
+  anywhere_ipv6_cidr_block = "::/0"
 }
 
 resource "aws_service_discovery_public_dns_namespace" "example" {

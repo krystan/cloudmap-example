@@ -42,7 +42,7 @@ resource "aws_security_group" "ec2" {
     to_port          = 0
     protocol         = "-1"
     cidr_blocks      = [local.anywhere_cidr_block]
-    ipv6_cidr_blocks = ["::/0"]
+    ipv6_cidr_blocks = [local.anywhere_ipv6_cidr_block]
   }
 
   tags = {
