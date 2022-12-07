@@ -1,24 +1,3 @@
-include {
-  path = find_in_parent_folders()
-}
-
-inputs = {
-  region = "eu-west-1"
-  subnet_id = "subnet-0c59a157"
-  public_dns_namespace_name = "test.nocashvalue.net"
-  private_dns_namespace_name = "krystan.example.local"
-}
-
-generate "provider" {
-  path      = "provider.tf"
-  if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-provider "aws" {
-  region = "eu-west-1"
-}
-EOF
-}
-
 generate "backend" {
   path      = "backend.tf"
   if_exists = "overwrite_terragrunt"
@@ -29,11 +8,23 @@ terraform {
 EOF
 }
 
-terraform {
-  source = "../../modules//cloudmap"
-
-  extra_arguments "retry_lock" {
-    commands  = get_terraform_commands_that_need_locking()
-    arguments = ["-lock-timeout=10m"]
-  }
+remote_state {
+  backend = "s3"
+  config = {
+        bucket         = "com.krystanhonour.production.cloudmap.learn.tf.state"
+        key            = "${path_relative_to_include()}/terraform.tfstate"
+        region         = "eu-west-1"
+        encrypt        = true
+        dynamodb_table = "terraform_cloudmap_study_lock_table"
+        s3_bucket_tags = {
+            Terraform   = "true"
+            Environment = "prod"
+        }
+        dynamodb_table_tags = {
+            owner       = "terragrunt"
+            name        = "Terraform lock table cloudmap learn"
+            Terraform   = "true"
+            Environment = "prod"
+        }
+    }
 }
